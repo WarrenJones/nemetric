@@ -1,4 +1,13 @@
 
+<a href="http://www.perfumejs.com/">
+  <img src="https://res.unclewarren.cn/nemo.png" align="left" width="200" />
+</a>
+
+# [Nemetrics v1.0.2]
+
+[![NPM version](https://badge.fury.io/js/perfume.js.svg)](https://www.npmjs.com/package/nemetric)
+
+
 **Nemetrics** 利用最新的 W3C Performance 提案 (比如 [PerformanceObserver](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceObserver/PerformanceObserver)), 用于测量第一个dom生成的时间(FP/FCP)、用户最早可操作时间（fid|tti）和组件的生命周期性能。向监控后台报告实际用户测量值。
 
 首次绘制 (FP)
