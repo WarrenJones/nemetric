@@ -144,9 +144,8 @@ export default class App extends React.Component {
 
 ### Performance Analytics
 
+![Performance Analytics](https://res.unclewarren.cn/nemo_monitor.png)
 ```
-![Performance Analytics](https://res.unclewarren.cn/ga_timing.png)
-
 ### 通用分析平台支持
 
 在`Nemetric`配置回调以支持任意平台
