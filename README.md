@@ -3,7 +3,7 @@
   <img src="https://res.unclewarren.cn/nemo.png" align="left" width="200" />
 </a>
 
-# [Nemetrics v1.0.2]((https://github.com/WarrenJones/nemetric))
+# [Nemetrics v1.0.3]((https://github.com/WarrenJones/nemetric))
 
 [![NPM version](https://badge.fury.io/js/perfume.js.svg)](https://www.npmjs.com/package/nemetric)
 
