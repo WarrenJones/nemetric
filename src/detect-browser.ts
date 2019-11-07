@@ -28,6 +28,8 @@ export class BotInfo implements DetectedInfo<'bot', null, null> {
 }
 
 type Browser =
+  | 'welike'
+  | 'vidmate'
   | 'aol'
   | 'edge'
   | 'yandexbrowser'
@@ -47,7 +49,7 @@ type Browser =
   | 'safari'
   | 'facebook'
   | 'instagram'
-  | 'ios-webview'
+  | 'ios-webview'　
   | 'searchbot';
 type OperatingSystem =
   | 'iOS'

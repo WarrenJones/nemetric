@@ -220,6 +220,8 @@ nemetric.sendTiming(metricName, durationFCP);
 
 ## 文章
 
+
+* [Nemetric 实现原理](https://unclewarren.cn/2019/11/05/%20Nemetric%20%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/)
 * [如何采集和分析网页用户的性能指标](https://unclewarren.cn/2019/08/19/如何采集和分析网页用户的性能指标/)
 * [Assessing Loading Performance in Real Life with Navigation and Resource Timing](https://developers.google.com/web/fundamentals/performance/user-centric-performance-metrics)
 * [navigation-timing](https://w3c.github.io/navigation-timing/)
