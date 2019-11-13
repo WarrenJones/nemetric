@@ -5,12 +5,13 @@ export interface IMetricEntry {
 }
 
 export type IPerformanceObserverType =
+    'largest-contentful-paint'
   | 'longtask'
   | 'measure'
   | 'navigation'
   | 'paint'
   | 'resource'
-  | 'first-input';
+  | 'first-input'
 
 export type IPerformanceEntryInitiatorType =
   | 'css'
@@ -27,6 +28,8 @@ export declare interface IPerformanceEntry {
   initiatorType?: IPerformanceEntryInitiatorType;
   name: string;
   startTime: number;
+  loadTime: number;
+  renderTime: number;
 }
 
 export interface IPerformancePaintTiming {

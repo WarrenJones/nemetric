@@ -4,7 +4,7 @@
  * 1.First Paint (FP),
  * 2.First Contentful Paint (FCP)
  * 3.First Input Delay (FID) same as TTI
- * 4.Hero Element
+ * 4.Largest Contentful Paint(LCP)
  * 5.Navigation Timing
  */
 import { BrowserInfo, detect } from './detect-browser';
@@ -30,6 +30,7 @@ export interface INemetricConfig {
   firstContentfulPaint: boolean;
   firstInputDelay: boolean;
   firstPaint: boolean;
+  largestContentfulPaint: boolean;
   dataConsumption: boolean;
   navigationTiming: boolean;
   // Analytics
@@ -54,6 +55,7 @@ export interface INemetricOptions {
   firstInputDelay?: boolean;
   firstPaint?: boolean;
   dataConsumption?: boolean;
+  largestContentfulPaint?:boolean;
   navigationTiming?: boolean;
   // Analytics
   analyticsTracker?: (options: IAnalyticsTrackerOptions) => void;
@@ -139,6 +141,7 @@ export default class Nemetric {
     firstPaint: false,
     firstInputDelay: false,
     dataConsumption: false,
+    largestContentfulPaint:false,
     navigationTiming: false,
     // Logging
     logPrefix: 'Nemetric:',
@@ -154,11 +157,13 @@ export default class Nemetric {
   firstPaintDuration: number = 0;
   firstContentfulPaintDuration: number = 0;
   firstInputDelayDuration: number = 0;
+  largestContentfulPaintDuration: number = 0;
   dataConsumption: number = 0;
   observeFirstPaint?: Promise<number>;
   observeFirstContentfulPaint?: Promise<number>;
   observeFirstInputDelay?: Promise<number>;
   observeDataConsumption?: Promise<number>;
+  observeLargestContentfulPaint?: Promise<number>;
   private browser: BrowserInfo | any;
   private dataConsumptionTimeout: any;
   private isHidden: boolean = false;
@@ -348,6 +353,11 @@ export default class Nemetric {
       this.initFirstInputDelay();
     });
 
+    // Largest Contentful Paint
+    this.observeLargestContentfulPaint = new Promise(resolve => {
+      this.observers['largestContentfulPaint'] = resolve;
+      this.initLargestContentfulPaint();
+    });
     // Collects KB information related to resources on the page
     if (this.config.dataConsumption) {
       this.observeDataConsumption = new Promise(resolve => {
@@ -465,7 +475,34 @@ export default class Nemetric {
       metricName: 'firstInputDelay',
       valueLog: 'duration',
     });
+    if (this.config.largestContentfulPaint) {
+      this.logMetric(
+        this.largestContentfulPaintDuration,
+        'Largest Contentful Paint',
+        'largestContentfulPaint',
+      );
+    }
     this.disconnectDataConsumption();
+  }
+   /**
+   * Update `lcp` to the latest value, using `renderTime` if it's available,
+   * otherwise using `loadTime`. (Note: `renderTime` may not be available if
+   * the element is an image and it's loaded cross-origin without the
+   * `Timing-Allow-Origin` header.)
+   */
+  private digestLargestContentfulPaint(entries: IPerformanceEntry[]): void {
+    const lastEntry = entries[entries.length - 1];
+    this.largestContentfulPaintDuration = lastEntry.renderTime || lastEntry.loadTime;
+  }
+  private initLargestContentfulPaint(): void {
+    try {
+      this.perfObservers.largestContentfulPaint = this.perf.performanceObserver(
+        'largest-contentful-paint',
+        this.digestLargestContentfulPaint.bind(this),
+      );
+    } catch (e) {
+      this.logWarn('initFirstInputDelay failed');
+    }
   }
 
   private initFirstInputDelay(): void {

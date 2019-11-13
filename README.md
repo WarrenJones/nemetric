@@ -5,14 +5,12 @@
 
 # [Nemetrics v1.0.3]((https://github.com/WarrenJones/nemetric))
 
-[![NPM version](https://badge.fury.io/js/perfume.js.svg)](https://www.npmjs.com/package/nemetric)
-
-
 **Nemetrics** 利用最新的 W3C Performance 提案 (比如 [PerformanceObserver](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceObserver/PerformanceObserver)), 用于测量第一个dom生成的时间(FP/FCP)、用户最早可操作时间（fid|tti）和组件的生命周期性能。向监控后台报告实际用户测量值。
 
 首次绘制 (FP)
 首次内容绘制 (FCP)
 首次输入延迟 (FID)
+最大的绘制元素(LCP)
 主角元素(Hero element)
 框架、组件生命周期监控
 Navigation Timing
@@ -51,6 +49,22 @@ const nemetric = new Nemetric({
   firstInputDelay: true
 });
 // Nemetric: First Input Delay 3.20 ms
+```
+### [最大内容绘制 (LCP)](https://web.dev/lcp/)
+
+**LCP** 标记的是浏览器渲染的最大的那个元素，可能是
+
+1.<img>元素
+2.<svg>里面的<image>元素
+3.<video>元素
+4.一个有background-image:url样式的元素
+5.块级元素包括 text节点或者其他内联元素 的元素
+
+```javascript
+const nemetric = new Nemetric({
+  largestContentfulPaint: true
+});
+// Nemetric: Largest Contentful Paint 2029.00 ms
 ```
 
 ### Navigation Timing
@@ -227,3 +241,4 @@ nemetric.sendTiming(metricName, durationFCP);
 * [navigation-timing](https://w3c.github.io/navigation-timing/)
 * [Idle Until Urgent](https://philipwalton.com/articles/idle-until-urgent/)
 * [First Input Delay](https://developers.google.com/web/updates/2018/05/first-input-delay)
+* [Largest Contentful Paint](https://web.dev/lcp/)
