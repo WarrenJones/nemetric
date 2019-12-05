@@ -3,7 +3,7 @@
   <img src="https://res.unclewarren.cn/nemo.png" align="left" width="200" />
 </a>
 
-# [Nemetrics v1.0.5]((https://github.com/WarrenJones/nemetric))
+# [Nemetrics v1.0.6]((https://github.com/WarrenJones/nemetric))
 一个小型的web性能监控库，它采集性能指标，如导航时间、资源时间、第一个有内容的油漆(FP/FCP)、最大的有内容油漆(LCP)、第一次输入延迟(FID)返回到您喜爱的分析工具。
 
 
@@ -11,12 +11,19 @@
 **Nemetrics** 利用最新的 W3C Performance 提案 (比如 [PerformanceObserver](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceObserver/PerformanceObserver)), 用于测量第一个dom生成的时间(FP/FCP)、LCP,用户最早可操作时间（fid|tti）和组件的生命周期性能。向监控后台报告实际用户测量值。
 
 [首次绘制 (FP)](https://developers.google.com/web/fundamentals/performance/user-centric-performance-metrics#%E8%B7%9F%E8%B8%AA_fpfcp)
+
 [首次内容绘制 (FCP)](https://developers.google.com/web/fundamentals/performance/user-centric-performance-metrics#%E8%B7%9F%E8%B8%AA_fpfcp)
+
 [首次输入延迟 (FID)](https://developers.google.com/web/updates/2018/05/first-input-delay)
+
 [最大的绘制元素(LCP)](https://web.dev/lcp/)
+
 主角元素(Hero element)
+
 框架、组件生命周期监控
+
 [Navigation Timing](https://w3c.github.io/navigation-timing/)
+
 Resource Timing
 
 ![](https://res.unclewarren.cn/first-paint-and-first-input-delay.png)
@@ -55,6 +62,7 @@ import Nemetric from 'node_modules/nemetric/dist/nemetric.umd.min.js';
   <li><b>Time to First Byte</b>:客户端发送HTTP GET请求以接收来自服务器的请求资源的第一个字节所花费的时间。
    它是最大的web页面加载时间组件，占整个web页面延迟的40%到60%。</li>
 </ul>
+
 ```javascript
 interface IAnalyticsTrackerOptions {
         data?: any;
