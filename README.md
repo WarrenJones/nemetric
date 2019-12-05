@@ -108,6 +108,7 @@ const nemetric = new Nemetric({
         }
 });
 // Nemetric: NavigationTiming {{'{'}} ... timeToFirstByte: 192.65 {{'}'}}
+
 ```
 
 ### Resource Timing
@@ -126,6 +127,19 @@ const nemetric = new Nemetric({
 // Nemetric: dataConsumption { "css": 185.95, "fetch": 0, "img": 377.93, ... , "script": 8344.95 }
 ```
 
+### NetworkInformation
+NetworkInformation 提供有关设备正在使用的连接与网络进行通信的信息，并提供了在连接类型更改时通知脚本的事件。NetworkInformation 接口不能被是实例化， 而是通过 Navigator 的 connection 属性进行访问。
+
+```javascript
+const nemetric = new Nemetric({
+  networkInformation: true,
+  analyticsTracker: (data: IAnalyticsTrackerOptions) => {
+          //上报到后台 
+          request.get('/metric/measure', data)
+    }
+});
+// Nemetric: NetworkInformation  {downlink: 10, effectiveType: "4g", rtt: 100, saveData: false}
+```
 
 ### 首次绘制 FP 
 **FP** 标记浏览器渲染任何在视觉上不同于导航前屏幕内容之内容的时间点
