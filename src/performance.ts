@@ -32,6 +32,16 @@ export declare interface IPerformanceEntry {
   renderTime: number;
 }
 
+export interface IPerfumeDataConsumption {
+  beacon: number;
+  css: number;
+  fetch: number;
+  img: number;
+  other: number;
+  script: number;
+  total: number;
+  xmlhttprequest: number;
+}
 export interface IPerformancePaintTiming {
   name: string;
   entryType: string;
@@ -45,6 +55,19 @@ declare interface IPerformanceObserverEntryList {
   getEntries: any;
   getEntriesByName: any;
   getEntriesByType: any;
+}
+
+type EffectiveConnectionType = '2g' | '3g' | '4g' | 'slow-2g';
+
+//https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation
+export interface INemetricNetworkInformation {
+  downlink?: number;
+  downlinkMax?:number;
+  effectiveType?: EffectiveConnectionType;
+  onchange?: () => void;
+  //https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/rtt
+  rtt?: number;
+  saveData?: boolean;
 }
 
 export interface IPerformanceObserver {
@@ -131,7 +154,7 @@ export default class Performance {
         (navigation.responseStart - navigation.requestStart).toFixed(2),
       ),
       // HTTP header size
-      headerSize: parseFloat((navigation.transferSize - navigation.encodedBodySize).toFixed(2)),
+      headerSize: parseFloat((navigation.transferSize - navigation.encodedBodySize|| 0).toFixed(2)),
       // Measuring DNS lookup time
       dnsLookupTime: parseFloat(
         (navigation.domainLookupEnd - navigation.domainLookupStart).toFixed(2),
@@ -139,6 +162,28 @@ export default class Performance {
     };
     return this.navigationTimingCached;
   }
+
+  /**
+   * The NetworkInformation interface provides information about the connection a device is using to communicate with the network and provides a means for scripts to be notified if the connection type changes. 
+   * The NetworkInformation interfaces cannot be instantiated. 
+   * It is instead accessed through the connection property of the Navigator interface.
+   */
+  get networkInformation(): INemetricNetworkInformation {
+    if ('connection' in window.navigator) {
+      const dataConnection = (window.navigator as any).connection;
+      if (typeof dataConnection !== 'object') {
+        return {};
+      }
+      return {
+        downlink: dataConnection.downlink,
+        effectiveType: dataConnection.effectiveType,
+        rtt: dataConnection.rtt,
+        saveData: !!dataConnection.saveData,
+      };
+    }
+    return {};
+  }
+
 
   /**
    * When performance API available

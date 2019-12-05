@@ -3,24 +3,92 @@
   <img src="https://res.unclewarren.cn/nemo.png" align="left" width="200" />
 </a>
 
-# [Nemetrics v1.0.4]((https://github.com/WarrenJones/nemetric))
+# [Nemetrics v1.0.5]((https://github.com/WarrenJones/nemetric))
+一个小型的web性能监控库，它采集性能指标，如导航时间、资源时间、第一个有内容的油漆(FP/FCP)、最大的有内容油漆(LCP)、第一次输入延迟(FID)返回到您喜爱的分析工具。
 
-**Nemetrics** 利用最新的 W3C Performance 提案 (比如 [PerformanceObserver](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceObserver/PerformanceObserver)), 用于测量第一个dom生成的时间(FP/FCP)、用户最早可操作时间（fid|tti）和组件的生命周期性能。向监控后台报告实际用户测量值。
 
-首次绘制 (FP)
-首次内容绘制 (FCP)
-首次输入延迟 (FID)
-最大的绘制元素(LCP)
+
+**Nemetrics** 利用最新的 W3C Performance 提案 (比如 [PerformanceObserver](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceObserver/PerformanceObserver)), 用于测量第一个dom生成的时间(FP/FCP)、LCP,用户最早可操作时间（fid|tti）和组件的生命周期性能。向监控后台报告实际用户测量值。
+
+[首次绘制 (FP)](https://developers.google.com/web/fundamentals/performance/user-centric-performance-metrics#%E8%B7%9F%E8%B8%AA_fpfcp)
+[首次内容绘制 (FCP)](https://developers.google.com/web/fundamentals/performance/user-centric-performance-metrics#%E8%B7%9F%E8%B8%AA_fpfcp)
+[首次输入延迟 (FID)](https://developers.google.com/web/updates/2018/05/first-input-delay)
+[最大的绘制元素(LCP)](https://web.dev/lcp/)
 主角元素(Hero element)
 框架、组件生命周期监控
-Navigation Timing
+[Navigation Timing](https://w3c.github.io/navigation-timing/)
+Resource Timing
 
 ![](https://res.unclewarren.cn/first-paint-and-first-input-delay.png)
-## 开始测量
+
+你可以收集这些指标，并在根据ip采集世界各地深入了解你的客户如何看待你的应用程序的web性能。使用您喜欢的分析工具来可视化国家之间的数据，
+
+下图是某个应用 印度/fetchTime/ 的数据图
+
+![](https://res.unclewarren.cn/WechatIMG99.png)
 
 
-### 首次绘制 (FP)
+## 如何使用
 
+npm (https://www.npmjs.com/package/nemetric):
+
+    npm install nemetric --save-dev
+    
+
+```javascript
+import Nemetric from 'nemetric';
+```
+
+UMD
+```javascript
+import Nemetric from 'node_modules/nemetric/dist/nemetric.umd.min.js';
+```
+
+### Navigation Timing
+<ul>
+  <li><b>DNS lookup</b>: 当用户请求URL时，将查询域名系统(DNS)，以将域转换为IP地址。</li>
+  <li><b>Header size</b>: HTTP 头部大小</li>
+  <li><b>Fetch time</b>:缓存查找和响应时间</li>
+  <li><b>Worker time</b>: Service worker 时间加上响应时间</li>
+  <li><b>Total time</b>:网络请求的请求和响应时间</li>
+  <li><b>Download time</b>: 响应时间</li>
+  <li><b>Time to First Byte</b>:客户端发送HTTP GET请求以接收来自服务器的请求资源的第一个字节所花费的时间。
+   它是最大的web页面加载时间组件，占整个web页面延迟的40%到60%。</li>
+</ul>
+```javascript
+interface IAnalyticsTrackerOptions {
+        data?: any;
+        metricName: string;
+        duration?: number;
+        browser?: BrowserInfo | any;
+}
+const nemetric = new Nemetric({
+  navigationTiming: true,
+  analyticsTracker: (data: IAnalyticsTrackerOptions) => {
+          //上报到后台 
+          request.get('/metric/measure', data)
+        }
+});
+// Nemetric: NavigationTiming {{'{'}} ... timeToFirstByte: 192.65 {{'}'}}
+```
+
+### Resource Timing
+Resource Timing收集与文档相关的资源的性能指标。比如css、script、图像等等。
+Nemetric帮助公开所有的PerformanceResourceTiming条目和分组数据。
+
+```javascript
+const nemetric = new Nemetric({
+  resourceTiming: true,
+  dataConsumption: true,
+  analyticsTracker: (data: IAnalyticsTrackerOptions) => {
+          //上报到后台 
+          request.get('/metric/measure', data)
+    }
+});
+// Nemetric: dataConsumption { "css": 185.95, "fetch": 0, "img": 377.93, ... , "script": 8344.95 }
+```
+
+### 首次绘制 FP 
 **FP** 标记浏览器渲染任何在视觉上不同于导航前屏幕内容之内容的时间点
 
 ```javascript
@@ -50,15 +118,15 @@ const nemetric = new Nemetric({
 });
 // Nemetric: First Input Delay 3.20 ms
 ```
-### [最大内容绘制 (LCP)](https://web.dev/lcp/)
+### 最大内容绘制 (LCP)
 
 **LCP** 标记的是浏览器渲染的最大的那个元素，可能是
 
-1.<img>元素
-2.<svg>里面的<image>元素
-3.<video>元素
-4.一个有background-image:url样式的元素
-5.块级元素包括 text节点或者其他内联元素 的元素
+1. <img>元素
+2. <svg>里面的<image>元素
+3. <video>元素
+4. 一个有background-image:url样式的元素
+5. 块级元素包括 text节点或者其他内联元素 的元素
 
 ```javascript
 const nemetric = new Nemetric({
@@ -67,21 +135,7 @@ const nemetric = new Nemetric({
 // Nemetric: Largest Contentful Paint 2029.00 ms
 ```
 
-### Navigation Timing
-![](https://res.unclewarren.cn/timestamp-diagram.svg)
-```javascript
-const nemetric = new Nemetric({
-  navigation timing: true
-});
-Nemetric: NavigationTiming  
-dnsLookupTime: 0
-downloadTime: 0.69
-fetchTime: 12.56
-headerSize: 317
-timeToFirstByte: 8.59
-totalTime: 9.28
-workerTime: 0
-```
+
 
 ### 在开发者工具中标记指标
 
@@ -163,23 +217,6 @@ export default class App extends React.Component {
 }
 ```
 
-## 分析
-
-### Performance Analytics
-
-![Performance Analytics](https://res.unclewarren.cn/nemo_monitor.png)
-```
-### 通用分析平台支持
-
-在`Nemetric`配置回调以支持任意平台
-
-```javascript
-const nemetric = new Nemetric({
-  analyticsTracker: ({data,metricName, duration, browser}) => {
-    navigator.sendBeacon(BI_URL,{data,metricName, duration,browser});
-  })
-});
-```
 
 ## 自定义 & 工具集
 
@@ -193,6 +230,11 @@ const options = {
   firstContentfulPaint: false,
   firstPaint: false,
   firstInputDelay: false,
+  largestContentfulPaint: true,
+  navigationTiming: true,
+  dataConsumption:true,
+  networkInformation: true,
+  resourceTiming: true,
   // Analytics
   analyticsTracker: undefined,
   // Logging

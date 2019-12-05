@@ -6,14 +6,16 @@
  * 3.First Input Delay (FID) same as TTI
  * 4.Largest Contentful Paint(LCP)
  * 5.Navigation Timing
+ * 6.Resouce Timing
  */
 import { BrowserInfo, detect } from './detect-browser';
 import { IdleQueue } from './idle-queue';
 import Performance, {
   IMetricEntry,
   IPerformanceEntry,
-  IPerformanceObserverType,
-  INemetricNavigationTiming
+  IPerfumeDataConsumption,
+  INemetricNavigationTiming,
+  INemetricNetworkInformation
 } from './performance';
 
 declare global {
@@ -33,13 +35,14 @@ export interface INemetricConfig {
   largestContentfulPaint: boolean;
   dataConsumption: boolean;
   navigationTiming: boolean;
+  networkInformation: boolean,
+  resourceTiming: boolean,
   // Analytics
   analyticsTracker?: (options: IAnalyticsTrackerOptions) => void;
   // Logging
   logPrefix: string;
   logging: boolean;
   maxMeasureTime: number;
-  maxDataConsumption: number;
   warning: boolean;
   // Debugging
   debugging: boolean;
@@ -57,13 +60,14 @@ export interface INemetricOptions {
   dataConsumption?: boolean;
   largestContentfulPaint?:boolean;
   navigationTiming?: boolean;
+  networkInformation?: boolean;
+  resourceTiming?: boolean;
   // Analytics
   analyticsTracker?: (options: IAnalyticsTrackerOptions) => void;
   // Logging
   logPrefix?: string;
   logging?: boolean;
   maxMeasureTime?: number;
-  maxDataConsumption?: number;
   warning?: boolean;
   // Debugging
   debugging?: boolean;
@@ -80,11 +84,6 @@ export interface ILogOptions {
   suffix?: string;
 }
 
-export interface IMetricEntry {
-  start: number;
-  end: number;
-}
-
 export interface IMetricMap {
   [metricName: string]: IMetricEntry;
 }
@@ -95,31 +94,6 @@ export interface IObservers {
 
 export interface IPerfObservers {
   [metricName: string]: any;
-}
-
-export type IPerformanceObserverType =
-  | 'longtask'
-  | 'measure'
-  | 'navigation'
-  | 'paint'
-  | 'resource'
-  | 'first-input';
-
-export type IPerformanceEntryInitiatorType =
-  | 'css'
-  | 'fetch'
-  | 'img'
-  | 'other'
-  | 'script'
-  | 'xmlhttprequest';
-
-export declare interface IPerformanceEntry {
-  decodedBodySize?: number;
-  duration: number;
-  entryType: IPerformanceObserverType;
-  initiatorType?: IPerformanceEntryInitiatorType;
-  name: string;
-  startTime: number;
 }
 
 export interface ISendTimingOptions {
@@ -143,11 +117,12 @@ export default class Nemetric {
     dataConsumption: false,
     largestContentfulPaint:false,
     navigationTiming: false,
+    networkInformation: false,
+    resourceTiming: false,
     // Logging
     logPrefix: 'Nemetric:',
     logging: true,
     maxMeasureTime: 15000,
-    maxDataConsumption: 20000,
     warning: false,
     debugging: false,
     //默认是app端内应用
@@ -158,7 +133,6 @@ export default class Nemetric {
   firstContentfulPaintDuration: number = 0;
   firstInputDelayDuration: number = 0;
   largestContentfulPaintDuration: number = 0;
-  dataConsumption: number = 0;
   observeFirstPaint?: Promise<number>;
   observeFirstContentfulPaint?: Promise<number>;
   observeFirstInputDelay?: Promise<number>;
@@ -173,7 +147,16 @@ export default class Nemetric {
   private observers: IObservers = {};
   private perf: Performance;
   private perfObservers: IPerfObservers = {};
-
+  private perfResourceTiming: IPerfumeDataConsumption = {
+    beacon: 0,
+    css: 0,
+    fetch: 0,
+    img: 0,
+    other: 0,
+    script: 0,
+    total: 0,
+    xmlhttprequest: 0,
+  };
   constructor(options: INemetricOptions = {}) {
     // Extend default config with external options
     this.config = Object.assign({}, this.config, options) as INemetricConfig;
@@ -210,6 +193,9 @@ export default class Nemetric {
     if (this.config.navigationTiming) {
       this.logNavigationTiming();
     }
+    if (this.config.networkInformation) {
+      this.logNetworkInformation();
+    }
   }
 
   get navigationTiming(): INemetricNavigationTiming {
@@ -217,6 +203,12 @@ export default class Nemetric {
       return {};
     }
     return this.perf.navigationTiming;
+  }
+  get networkInformation(): INemetricNetworkInformation {
+    if (!this.config.networkInformation) {
+      return {};
+    }
+    return this.perf.networkInformation;
   }
 
   /**
@@ -359,7 +351,7 @@ export default class Nemetric {
       this.initLargestContentfulPaint();
     });
     // Collects KB information related to resources on the page
-    if (this.config.dataConsumption) {
+    if (this.config.resourceTiming || this.config.dataConsumption) {
       this.observeDataConsumption = new Promise(resolve => {
         this.observers['dataConsumption'] = resolve;
         this.initDataConsumption();
@@ -426,11 +418,12 @@ export default class Nemetric {
   }): void {
     this.logDebug('performanceObserverResourceCb', options);
     options.entries.forEach((performanceEntry: IPerformanceEntry) => {
-      if (performanceEntry.decodedBodySize) {
-        const decodedBodySize = parseFloat(
-          (performanceEntry.decodedBodySize / 1000).toFixed(2),
-        );
-        this.dataConsumption += decodedBodySize;
+      if (  this.config.dataConsumption &&
+        performanceEntry.decodedBodySize &&
+        performanceEntry.initiatorType) {
+        const bodySize = performanceEntry.decodedBodySize / 1000;
+        this.perfResourceTiming[performanceEntry.initiatorType] += bodySize;
+        this.perfResourceTiming.total += bodySize;
       }
     });
   }
@@ -523,17 +516,26 @@ export default class Nemetric {
   }
 
   private disconnectDataConsumption(): void {
-    clearTimeout(this.dataConsumptionTimeout);
-    if (!this.perfObservers.dataConsumption || !this.dataConsumption) {
+    if (!this.dataConsumptionTimeout) {
       return;
     }
-    this.logMetric(
-      this.dataConsumption,
-      'Data Consumption',
-      'dataConsumption',
-      'Kb',
-    );
-    this.perfObservers.dataConsumption.disconnect();
+    clearTimeout(this.dataConsumptionTimeout);
+    this.dataConsumptionTimeout = undefined;
+    this.logData('dataConsumption', this.perfResourceTiming);
+  }
+
+  private logData(metricName: string, data: any): void {
+    Object.keys(data).forEach(key => {
+      if (typeof data[key] === 'number') {
+        data[key] = parseFloat(data[key].toFixed(2));
+      }
+    });
+    this.pushTask(() => {
+      // Logs the metric in the internal console.log
+      this.log({ metricName, data });
+      // Sends the metric to an external tracking service
+      this.sendTiming({ metricName, data });
+    });
   }
 
   private initDataConsumption(): void {
@@ -587,34 +589,17 @@ export default class Nemetric {
     const duration2Decimal = parseFloat(duration.toFixed(2));
     // Stop Analytics and Logging for false negative metrics
     if (
-      metricName !== 'dataConsumption' &&
-      duration2Decimal > this.config.maxMeasureTime
-    ) {
-      return;
-    } else if (
-      metricName === 'dataConsumption' &&
-      duration2Decimal > this.config.maxDataConsumption
+      duration2Decimal > this.config.maxMeasureTime ||
+      duration2Decimal <= 0
     ) {
       return;
     }
-
-    // Save metrics in Duration property
-    if (metricName === 'firstPaint') {
-      this.firstPaintDuration = duration2Decimal;
-    }
-    if (metricName === 'firstContentfulPaint') {
-      this.firstContentfulPaintDuration = duration2Decimal;
-    }
-    if (metricName === 'firstInputDelay') {
-      this.firstInputDelayDuration = duration2Decimal;
-    }
-    this.observers[metricName](duration2Decimal);
-
-    // Logs the metric in the internal console.log
-    this.log({ metricName: logText, duration: duration2Decimal, suffix });
-
-    // Sends the metric to an external tracking service
-    this.sendTiming({ metricName, duration: duration2Decimal });
+    this.pushTask(() => {
+      // Logs the metric in the internal console.log
+      this.log({ metricName, data: `${duration2Decimal} ${suffix}` });
+      // Sends the metric to an external tracking service
+      this.sendTiming({ metricName, duration: duration2Decimal });
+    });
   }
 
   /**
@@ -634,6 +619,13 @@ export default class Nemetric {
     this.log({ metricName, data: this.navigationTiming, suffix: '' });
     // Sends the metric to an external tracking service
     this.sendTiming({ metricName, data: this.navigationTiming });
+  }
+  private logNetworkInformation() {
+    const metricName = 'NetworkInformation';
+    // Logs the metric in the internal console.log
+    this.log({ metricName, data: this.networkInformation, suffix: '' });
+    // Sends the metric to an external tracking service
+    this.sendTiming({ metricName, data: this.networkInformation });
   }
 
   private pushTask(cb: any): void {
