@@ -1,12 +1,11 @@
 {
   "name": "nemetric",
-  "version": "1.0.6",
+  "version": "1.2.0",
   "description": "用于测量第一个dom生成的时间(FP/FCP/LCP)、用户最早可操作时间（fid|tti）和组件的生命周期性能。向监控后台报告实际用户测量值。",
-  "main": "dist/es/nemetric.js",
-  "types": "dist/types/nemetric.d.ts",
+  "main": "dist/nemetric.min.js",
   "iife": "dist/nemetric.iife.min.js",
   "module": "dist/nemetric.esm.min.js",
-  "unpkg": "dist/perfunemetricme.umd.min.js",
+  "unpkg": "dist/nemetric.umd.min.js",
   "typings": "dist/types/nemetric.d.ts",
   "keywords": [
     "performance-metrics",
@@ -25,14 +24,17 @@
     "采集",
     "监控"
   ],
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=10.0.0"
   },
   "scripts": {
     "test": "jest",
-    "prepare": "npm run build",
     "prebuild": "rimraf dist",
-    "build": "tsc && tsc --module commonjs --outDir dist/lib && rollup -c rollup.config.ts"
+    "build": "tsc && tsc --module commonjs --outDir dist/lib && rollup -c rollup.config.ts",
+    "start": "tsc -w & rollup -c rollup.config.ts -w"
   },
   "repository": {
     "type": "git",
@@ -79,19 +81,21 @@
     "url": "https://github.com/WarrenJones/nemetric/issues"
   },
   "homepage": "https://github.com/WarrenJones/nemetric#readme",
+  "dependencies": {
+    "detect-browser": "4.5.1",
+    "idlize": "0.1.1"
+  },
   "devDependencies": {
-    "@types/jest": "^24.0.20",
-    "@types/node": "^12.11.7",
+    "@types/jest": "^24.0.23",
+    "@types/node": "^12.12.14",
     "jest": "^24.9.0",
+    "rollup": "^1.27.8",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-terser": "^5.1.2",
-    "ts-jest": "^24.1.0",
-    "ts-node": "^8.4.1",
-    "typescript": "^3.6.4"
-  },
-  "dependencies": {
-    "rollup": "^1.27.8"
+    "ts-jest": "^24.2.0",
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3"
   }
 }

@@ -1,4 +1,3 @@
-// Types
 export interface IMetricEntry {
   start: number;
   end: number;

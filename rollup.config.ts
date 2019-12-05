@@ -4,68 +4,13 @@ import sourceMaps from 'rollup-plugin-sourcemaps';
 import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
 
-const createConfig = ({ output, min = false }) => {
+const ensureArray = maybeArr =>
+  Array.isArray(maybeArr) ? maybeArr : [maybeArr];
+
+const createConfig = ({ output, includeExternals = false, min = false }) => {
   const minify =
     min &&
     terser({
-      mangle: {
-        properties: {
-          reserved: [
-            'config',
-            'navigationTiming',
-            'resourceTiming',
-            'start',
-            'end',
-            'endPaint',
-            'fetchTime',
-            'workerTime',
-            'totalTime',
-            'downloadTime',
-            'timeToFirstByte',
-            'headerSize',
-            'dnsLookupTime',
-            'chrome',
-            'hidden',
-            'addEventListener',
-            'requestIdleCallback',
-            'metricName',
-            'firstContentfulPaint',
-            'firstInputDelay',
-            'firstPaint',
-            'dataConsumption',
-            'largestContentfulPaint',
-            'navigationTiming',
-            'analyticsTracker',
-            'logPrefix',
-            'logging',
-            'maxMeasureTime',
-            'beacon',
-            'css',
-            'fetch',
-            'img',
-            'other',
-            'script',
-            'total',
-            'xmlhttprequest',
-            'initiatorType',
-            'decodedBodySize',
-            'renderTime',
-            'loadTime',
-            'eventProperties',
-            'navigator',
-            'connection',
-            'networkInformation',
-            'downlink',
-            'effectiveType',
-            'rtt',
-            'saveData',
-            'workerStart',
-            'transferSize',
-            'encodedBodySize',
-            'nemetric',
-          ]
-        }
-      },
       output: {
         comments(node, { text, type }) {
           if (type === 'comment2') {
@@ -75,7 +20,7 @@ const createConfig = ({ output, min = false }) => {
         },
       },
     });
-
+  
   const plugins = [
     // https://github.com/rollup/rollup-plugin-node-resolve#usage
     resolve(),
@@ -94,9 +39,16 @@ const createConfig = ({ output, min = false }) => {
     output: {
       file: output.file,
       format: output.format,
-      name: 'nemetric',
+      name: 'Nemetric',
       sourcemap: true,
     },
+    // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
+    external: includeExternals
+      ? []
+      : [
+          ...Object.keys(pkg.dependencies || {}),
+          ...Object.keys(pkg.peerDependencies || {}),
+        ],
     watch: { include: 'dist/es/**' },
     plugins: plugins.filter(Boolean),
   };
@@ -119,16 +71,20 @@ export default [
   }),
   createConfig({
     output: { file: pkg.iife, format: 'iife' },
+    includeExternals: true,
   }),
   createConfig({
     output: { file: 'dist/nemetric.iife.min.js', format: 'iife' },
+    includeExternals: true,
     min: true,
   }),
   createConfig({
     output: { file: pkg.unpkg, format: 'umd' },
+    includeExternals: true,
   }),
   createConfig({
     output: { file: 'dist/nemetric.umd.min.js', format: 'umd' },
+    includeExternals: true,
     min: true,
   }),
 ];

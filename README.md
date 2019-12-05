@@ -3,7 +3,7 @@
   <img src="https://res.unclewarren.cn/nemo.png" align="left" width="200" />
 </a>
 
-# [Nemetrics v1.0.6]((https://github.com/WarrenJones/nemetric))
+# [Nemetrics v1.2.0]((https://github.com/WarrenJones/nemetric))
 一个小型的web性能监控库，它采集性能指标，如导航时间、资源时间、第一个有内容的油漆(FP/FCP)、最大的有内容油漆(LCP)、第一次输入延迟(FID)返回到您喜爱的分析工具。
 
 
@@ -24,7 +24,9 @@
 
 [Navigation Timing](https://w3c.github.io/navigation-timing/)
 
-Resource Timing
+[Resource Timing](https://developer.mozilla.org/en-US/docs/Web/API/Resource_Timing_API/Using_the_Resource_Timing_API)
+
+[NetworkInformation](https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation)
 
 ![](https://res.unclewarren.cn/first-paint-and-first-input-delay.png)
 
@@ -123,6 +125,7 @@ const nemetric = new Nemetric({
 });
 // Nemetric: dataConsumption { "css": 185.95, "fetch": 0, "img": 377.93, ... , "script": 8344.95 }
 ```
+
 
 ### 首次绘制 FP 
 **FP** 标记浏览器渲染任何在视觉上不同于导航前屏幕内容之内容的时间点
