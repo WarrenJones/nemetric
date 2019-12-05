@@ -52,6 +52,10 @@ import Nemetric from 'node_modules/nemetric/dist/nemetric.umd.min.js';
 ```
 
 ### Navigation Timing
+
+![](https://camo.githubusercontent.com/ef97037de2daed3f359061ce34ed0d3ca61e1dfc/68747470733a2f2f7265732e756e636c6577617272656e2e636e2f74696d657374616d702d6469616772616d2e737667)
+
+
 <ul>
   <li><b>DNS lookup</b>: 当用户请求URL时，将查询域名系统(DNS)，以将域转换为IP地址。</li>
   <li><b>Header size</b>: HTTP 头部大小</li>
@@ -62,6 +66,30 @@ import Nemetric from 'node_modules/nemetric/dist/nemetric.umd.min.js';
   <li><b>Time to First Byte</b>:客户端发送HTTP GET请求以接收来自服务器的请求资源的第一个字节所花费的时间。
    它是最大的web页面加载时间组件，占整个web页面延迟的40%到60%。</li>
 </ul>
+
+```javascript
+// fetchStart marks when the browser starts to fetch a resource
+      // responseEnd is when the last byte of the response arrives
+      fetchTime: parseFloat((navigation.responseEnd - navigation.fetchStart).toFixed(2)),
+      // Service worker time plus response time
+      workerTime: parseFloat(
+        (navigation.workerStart > 0 ? navigation.responseEnd - navigation.workerStart : 0).toFixed(2),
+      ),
+      // Request plus response time (network only)
+      totalTime: parseFloat((navigation.responseEnd - navigation.requestStart).toFixed(2)),
+      // Response time only (download)
+      downloadTime: parseFloat((navigation.responseEnd - navigation.responseStart).toFixed(2)),
+      // Time to First Byte (TTFB)
+      timeToFirstByte: parseFloat(
+        (navigation.responseStart - navigation.requestStart).toFixed(2),
+      ),
+      // HTTP header size
+      headerSize: parseFloat((navigation.transferSize - navigation.encodedBodySize|| 0).toFixed(2)),
+      // Measuring DNS lookup time
+      dnsLookupTime: parseFloat(
+        (navigation.domainLookupEnd - navigation.domainLookupStart).toFixed(2),
+      )
+```
 
 ```javascript
 interface IAnalyticsTrackerOptions {
