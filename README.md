@@ -3,7 +3,7 @@
   <img src="https://res.unclewarren.cn/nemo.png" align="left" width="200" />
 </a>
 
-# [Nemetrics v1.2.0]((https://github.com/WarrenJones/nemetric))
+# [Nemetrics v1.2.1]((https://github.com/WarrenJones/nemetric))
 一个小型的web性能监控库，它采集性能指标，如导航时间、资源时间、第一个有内容的油漆(FP/FCP)、最大的有内容油漆(LCP)、第一次输入延迟(FID)返回到您喜爱的分析工具。
 
 
@@ -67,6 +67,7 @@ import Nemetric from 'node_modules/nemetric/dist/nemetric.umd.min.js';
   <li><b>Download time</b>: 响应时间</li>
   <li><b>Time to First Byte</b>:客户端发送HTTP GET请求以接收来自服务器的请求资源的第一个字节所花费的时间。
    它是最大的web页面加载时间组件，占整个web页面延迟的40%到60%。</li>
+  <li><b>page Load Time</b>:页面加载所需的总时长</li>
 </ul>
 
 ```javascript
@@ -90,6 +91,10 @@ import Nemetric from 'node_modules/nemetric/dist/nemetric.umd.min.js';
       // Measuring DNS lookup time
       dnsLookupTime: parseFloat(
         (navigation.domainLookupEnd - navigation.domainLookupStart).toFixed(2),
+      ),
+      //page load time
+      pageLoadTime:parseFloat(
+        (navigation.loadEventEnd - navigation.startTime).toFixed(2),
       )
 ```
 

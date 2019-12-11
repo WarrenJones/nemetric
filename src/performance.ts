@@ -82,6 +82,7 @@ export interface INemetricNavigationTiming {
   timeToFirstByte?: number;
   headerSize?: number;
   dnsLookupTime?: number;
+  pageLoadTime?:number;
 }
 
 export default class Performance {
@@ -157,6 +158,10 @@ export default class Performance {
       // Measuring DNS lookup time
       dnsLookupTime: parseFloat(
         (navigation.domainLookupEnd - navigation.domainLookupStart).toFixed(2),
+      ),
+      //page load time
+      pageLoadTime:parseFloat(
+        (navigation.loadEventEnd - navigation.startTime).toFixed(2),
       ),
     };
     return this.navigationTimingCached;
