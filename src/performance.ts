@@ -4,7 +4,7 @@ export interface IMetricEntry {
 }
 
 export type IPerformanceObserverType =
-    'largest-contentful-paint'
+  'largest-contentful-paint'
   | 'longtask'
   | 'measure'
   | 'navigation'
@@ -61,7 +61,7 @@ type EffectiveConnectionType = '2g' | '3g' | '4g' | 'slow-2g';
 //https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation
 export interface INemetricNetworkInformation {
   downlink?: number;
-  downlinkMax?:number;
+  downlinkMax?: number;
   effectiveType?: EffectiveConnectionType;
   onchange?: () => void;
   //https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/rtt
@@ -82,7 +82,7 @@ export interface INemetricNavigationTiming {
   timeToFirstByte?: number;
   headerSize?: number;
   dnsLookupTime?: number;
-  pageLoadTime?:number;
+  pageLoadTime?: number;
 }
 
 export default class Performance {
@@ -121,10 +121,9 @@ export default class Performance {
    * w3c.github.io/navigation-timing/
    * developers.google.com/web/fundamentals/performance/navigation-and-resource-timing
    */
-  get navigationTiming(): INemetricNavigationTiming {
+  getNavigationTiming(afteronLoad = false): INemetricNavigationTiming {
     if (
-      !Performance.supported() ||
-      Object.keys(this.navigationTimingCached).length
+      !Performance.supported()
     ) {
       return this.navigationTimingCached;
     }
@@ -136,6 +135,13 @@ export default class Performance {
       return this.navigationTimingCached;
     }
 
+    if (afteronLoad) {
+      return {
+        pageLoadTime: parseFloat(
+          (navigation.loadEventEnd - navigation.startTime).toFixed(2),
+        )
+      }
+    }
     // We cache the navigation time for future times
     this.navigationTimingCached = {
       // fetchStart marks when the browser starts to fetch a resource
@@ -154,15 +160,11 @@ export default class Performance {
         (navigation.responseStart - navigation.requestStart).toFixed(2),
       ),
       // HTTP header size
-      headerSize: parseFloat((navigation.transferSize - navigation.encodedBodySize|| 0).toFixed(2)),
+      headerSize: parseFloat((navigation.transferSize - navigation.encodedBodySize || 0).toFixed(2)),
       // Measuring DNS lookup time
       dnsLookupTime: parseFloat(
         (navigation.domainLookupEnd - navigation.domainLookupStart).toFixed(2),
-      ),
-      //page load time
-      pageLoadTime:parseFloat(
-        (navigation.loadEventEnd - navigation.startTime).toFixed(2),
-      ),
+      )
     };
     return this.navigationTimingCached;
   }
@@ -203,7 +205,7 @@ export default class Performance {
     (window.performance.mark as any)(mark);
   }
 
- 
+
 
   measure(metricName: string, metric: IMetricEntry): number {
     const startMark = `mark_${metricName}_start`;

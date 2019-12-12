@@ -191,11 +191,11 @@ export default class Nemetric {
     }
   }
 
-  get navigationTiming(): INemetricNavigationTiming {
+  getNavigationTiming(afterOnload = false): INemetricNavigationTiming {
     if (!this.config.navigationTiming) {
       return {};
     }
-    return this.perf.navigationTiming;
+    return this.perf.getNavigationTiming(afterOnload);
   }
   get networkInformation(): INemetricNetworkInformation {
     if (!this.config.networkInformation) {
@@ -251,7 +251,7 @@ export default class Nemetric {
     });
     return duration2Decimal;
   }
-  
+
   /**
    * clear performance mark if meanwhile meet bugs
    * @param markName 
@@ -342,7 +342,7 @@ export default class Nemetric {
       this.initLargestContentfulPaint();
     });
     // Collects KB information related to resources on the page
-    if (this.config.dataConsumption ) {
+    if (this.config.dataConsumption) {
       this.observeDataConsumption = new Promise(resolve => {
         this.observers['dataConsumption'] = resolve;
         this.initDataConsumption();
@@ -603,13 +603,21 @@ export default class Nemetric {
 
   private logNavigationTiming() {
     const metricName = 'NavigationTiming';
+    //先上报一次，这时候没有page Load Time
+    this.pushTask(() => {
+      // Logs the metric in the internal console.log
+      this.log({ metricName, data:  this.getNavigationTiming(false), suffix: '' });
+      // Sends the metric to an external tracking service
+      this.sendTiming({ metricName, data:this.getNavigationTiming(false)});
+    })
     //navigationTiming include pageLoadTime,so it needed to calculate after onload
+    //单独上报一次page Load Time
     window.addEventListener('load', (event) => {
       this.pushTask(() => {
         // Logs the metric in the internal console.log
-        this.log({ metricName, data: this.navigationTiming, suffix: '' });
+        this.log({ metricName, data: this.getNavigationTiming(true), suffix: '' });
         // Sends the metric to an external tracking service
-        this.sendTiming({ metricName, data: this.navigationTiming });
+        this.sendTiming({ metricName, data: this.getNavigationTiming(true)});
       })
     })
   }
