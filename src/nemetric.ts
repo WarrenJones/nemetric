@@ -13,7 +13,7 @@ import { IdleQueue } from './idle-queue';
 import Performance, {
   IMetricEntry,
   IPerformanceEntry,
-  IPerfumeDataConsumption,
+  IPerformanceDataConsumption,
   INemetricNavigationTiming,
   INemetricNetworkInformation
 } from './performance';
@@ -58,7 +58,7 @@ export interface INemetricOptions {
   firstInputDelay?: boolean;
   firstPaint?: boolean;
   dataConsumption?: boolean;
-  largestContentfulPaint?:boolean;
+  largestContentfulPaint?: boolean;
   navigationTiming?: boolean;
   networkInformation?: boolean;
   resourceTiming?: boolean;
@@ -115,7 +115,7 @@ export default class Nemetric {
     firstPaint: false,
     firstInputDelay: false,
     dataConsumption: false,
-    largestContentfulPaint:false,
+    largestContentfulPaint: false,
     navigationTiming: false,
     networkInformation: false,
     resourceTiming: false,
@@ -147,7 +147,7 @@ export default class Nemetric {
   private observers: IObservers = {};
   private perf: Performance;
   private perfObservers: IPerfObservers = {};
-  private perfResourceTiming: IPerfumeDataConsumption = {
+  private perfResourceTiming: IPerformanceDataConsumption = {
     beacon: 0,
     css: 0,
     fetch: 0,
@@ -296,16 +296,6 @@ export default class Nemetric {
   }
 
   /**
-   * Coloring Debugging Text in Browser Console
-   */
-  logDebug(methodName: string, debugValue: any = ''): void {
-    if (!this.config.debugging) {
-      return;
-    }
-    window.console.log(`Nemetric.js debugging ${methodName}:`, debugValue);
-  }
-
-  /**
    * Sends the User timing measure to Analytics System.
    */
   sendTiming(options: ISendTimingOptions): void {
@@ -327,11 +317,9 @@ export default class Nemetric {
     // Init observe FCP  and creates the Promise to observe metric
     if (this.config.firstPaint || this.config.firstContentfulPaint) {
       this.observeFirstPaint = new Promise(resolve => {
-        this.logDebug('observeFirstPaint');
         this.observers['firstPaint'] = resolve;
       });
       this.observeFirstContentfulPaint = new Promise(resolve => {
-        this.logDebug('observeFirstContentfulPaint');
         this.observers['firstContentfulPaint'] = resolve;
         this.initFirstPaint();
       });
@@ -383,7 +371,6 @@ export default class Nemetric {
     metricName: INemetricMetrics;
     valueLog: 'duration' | 'startTime';
   }): void {
-    this.logDebug('performanceObserverCb', options);
     options.entries.forEach((performanceEntry: IPerformanceEntry) => {
       this.pushTask(() => {
         if (
@@ -416,9 +403,8 @@ export default class Nemetric {
   private performanceObserverResourceCb(options: {
     entries: IPerformanceEntry[];
   }): void {
-    this.logDebug('performanceObserverResourceCb', options);
     options.entries.forEach((performanceEntry: IPerformanceEntry) => {
-      if (  this.config.dataConsumption &&
+      if (this.config.dataConsumption &&
         performanceEntry.decodedBodySize &&
         performanceEntry.initiatorType) {
         const bodySize = performanceEntry.decodedBodySize / 1000;
@@ -450,7 +436,6 @@ export default class Nemetric {
    * the biggest above-the-fold layout change has happened.
    */
   private initFirstPaint(): void {
-    this.logDebug('initFirstPaint');
     try {
       this.perfObservers.firstContentfulPaint = this.perf.performanceObserver(
         'paint',
@@ -477,12 +462,12 @@ export default class Nemetric {
     }
     this.disconnectDataConsumption();
   }
-   /**
-   * Update `lcp` to the latest value, using `renderTime` if it's available,
-   * otherwise using `loadTime`. (Note: `renderTime` may not be available if
-   * the element is an image and it's loaded cross-origin without the
-   * `Timing-Allow-Origin` header.)
-   */
+  /**
+  * Update `lcp` to the latest value, using `renderTime` if it's available,
+  * otherwise using `loadTime`. (Note: `renderTime` may not be available if
+  * the element is an image and it's loaded cross-origin without the
+  * `Timing-Allow-Origin` header.)
+  */
   private digestLargestContentfulPaint(entries: IPerformanceEntry[]): void {
     const lastEntry = entries[entries.length - 1];
     this.largestContentfulPaintDuration = lastEntry.renderTime || lastEntry.loadTime;
@@ -615,10 +600,16 @@ export default class Nemetric {
 
   private logNavigationTiming() {
     const metricName = 'NavigationTiming';
-    // Logs the metric in the internal console.log
-    this.log({ metricName, data: this.navigationTiming, suffix: '' });
-    // Sends the metric to an external tracking service
-    this.sendTiming({ metricName, data: this.navigationTiming });
+    //navigationTiming include pageLoadTime,so it needed to calculate after onload
+    window.onload = () => {
+      this.pushTask(() => {
+        // Logs the metric in the internal console.log
+        this.log({ metricName, data: this.navigationTiming, suffix: '' });
+        // Sends the metric to an external tracking service
+        this.sendTiming({ metricName, data: this.navigationTiming });
+        window.onload = null;
+      })
+    }
   }
   private logNetworkInformation() {
     const metricName = 'NetworkInformation';

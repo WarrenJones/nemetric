@@ -31,7 +31,7 @@ export declare interface IPerformanceEntry {
   renderTime: number;
 }
 
-export interface IPerfumeDataConsumption {
+export interface IPerformanceDataConsumption {
   beacon: number;
   css: number;
   fetch: number;
