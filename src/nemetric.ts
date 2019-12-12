@@ -601,15 +601,14 @@ export default class Nemetric {
   private logNavigationTiming() {
     const metricName = 'NavigationTiming';
     //navigationTiming include pageLoadTime,so it needed to calculate after onload
-    window.onload = () => {
+    window.addEventListener('load', (event) => {
       this.pushTask(() => {
         // Logs the metric in the internal console.log
         this.log({ metricName, data: this.navigationTiming, suffix: '' });
         // Sends the metric to an external tracking service
         this.sendTiming({ metricName, data: this.navigationTiming });
-        window.onload = null;
       })
-    }
+    })
   }
   private logNetworkInformation() {
     const metricName = 'NetworkInformation';

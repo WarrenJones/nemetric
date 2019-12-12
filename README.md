@@ -3,7 +3,7 @@
   <img src="https://res.unclewarren.cn/nemo.png" align="left" width="200" />
 </a>
 
-# [Nemetrics v1.2.2]((https://github.com/WarrenJones/nemetric))
+# [Nemetrics v1.2.3]((https://github.com/WarrenJones/nemetric))
 一个小型的web性能监控库，它采集性能指标，如导航时间、资源时间、第一个有内容的油漆(FP/FCP)、最大的有内容油漆(LCP)、第一次输入延迟(FID)返回到您喜爱的分析工具。
 
 
