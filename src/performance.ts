@@ -203,6 +203,8 @@ export default class Performance {
     (window.performance.mark as any)(mark);
   }
 
+ 
+
   measure(metricName: string, metric: IMetricEntry): number {
     const startMark = `mark_${metricName}_start`;
     const endMark = `mark_${metricName}_end`;

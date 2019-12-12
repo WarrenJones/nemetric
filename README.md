@@ -259,6 +259,9 @@ export default class App extends React.Component {
   loadData = async () => {
     await request.get('whatever1');
     await request.get('whatever2');
+    if(err){
+       nemetric.clear('AppAfterPaint');
+    }
     // 结束测量部件绘制时间
     nemetric.endPaint('AppAfterPaint');
   }

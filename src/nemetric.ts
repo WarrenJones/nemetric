@@ -251,6 +251,16 @@ export default class Nemetric {
     });
     return duration2Decimal;
   }
+  
+  /**
+   * clear performance mark if meanwhile meet bugs
+   * @param markName 
+   */
+  clear(markName: string): void {
+    window.performance.clearMarks(`mark_${markName}_start`);
+    window.performance.clearMarks(`mark_${markName}_end`);
+    delete this.metrics[markName];
+  }
 
   /**
    * End performance measurement after first paint from the beging of it
