@@ -283,29 +283,24 @@ export default class App extends React.Component {
 在构造函数中提供给Nemetric默认选项。
 
 ```javascript
-const options = {
-  // Metrics
-  firstContentfulPaint: false,
-  firstPaint: false,
-  firstInputDelay: false,
-  largestContentfulPaint: true,
-  navigationTiming: true,
-  dataConsumption:true,
-  networkInformation: true,
-  resourceTiming: true,
-  // Analytics
-  analyticsTracker: undefined,
-  // Logging
-  logPrefix: 'Nemetric:',
-  logging: true,
-  maxMeasureTime: 15000,
-  warning: false,
-  debugging: false,
-  //是否在端内(针对端内做其他动作)
-  inApp:true,
-  //采样率0-1
-  sampleRate:1,
-};
+const config: INemetricConfig = {
+    // Metrics
+    firstContentfulPaint: false,
+    firstPaint: false,
+    firstInputDelay: false,
+    largestContentfulPaint: false,
+    navigationTiming: false,
+    networkInformation: false,
+    dataConsumption: false,
+    // Logging
+    logPrefix: 'Nemetric:',
+    logging: true,
+    maxMeasureTime: 15000,
+    warning: false,
+    //默认是app端内应用
+    inApp: true,
+    sampleRate: 1
+  };
 ```
 
 #### 工具集

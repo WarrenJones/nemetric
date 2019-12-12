@@ -33,10 +33,9 @@ export interface INemetricConfig {
   firstInputDelay: boolean;
   firstPaint: boolean;
   largestContentfulPaint: boolean;
-  dataConsumption: boolean;
   navigationTiming: boolean;
   networkInformation: boolean,
-  resourceTiming: boolean,
+  dataConsumption: boolean,
   // Analytics
   analyticsTracker?: (options: IAnalyticsTrackerOptions) => void;
   // Logging
@@ -44,8 +43,7 @@ export interface INemetricConfig {
   logging: boolean;
   maxMeasureTime: number;
   warning: boolean;
-  // Debugging
-  debugging: boolean;
+
   //is for in-app
   inApp: boolean;
   //sample rate 0~1
@@ -57,11 +55,10 @@ export interface INemetricOptions {
   firstContentfulPaint?: boolean;
   firstInputDelay?: boolean;
   firstPaint?: boolean;
-  dataConsumption?: boolean;
   largestContentfulPaint?: boolean;
   navigationTiming?: boolean;
   networkInformation?: boolean;
-  resourceTiming?: boolean;
+  dataConsumption?: boolean;
   // Analytics
   analyticsTracker?: (options: IAnalyticsTrackerOptions) => void;
   // Logging
@@ -69,8 +66,6 @@ export interface INemetricOptions {
   logging?: boolean;
   maxMeasureTime?: number;
   warning?: boolean;
-  // Debugging
-  debugging?: boolean;
   //is for in-app
   inApp?: boolean;
   //0~1
@@ -114,17 +109,15 @@ export default class Nemetric {
     firstContentfulPaint: false,
     firstPaint: false,
     firstInputDelay: false,
-    dataConsumption: false,
     largestContentfulPaint: false,
     navigationTiming: false,
     networkInformation: false,
-    resourceTiming: false,
+    dataConsumption: false,
     // Logging
     logPrefix: 'Nemetric:',
     logging: true,
     maxMeasureTime: 15000,
     warning: false,
-    debugging: false,
     //默认是app端内应用
     inApp: true,
     sampleRate: 1
@@ -147,7 +140,7 @@ export default class Nemetric {
   private observers: IObservers = {};
   private perf: Performance;
   private perfObservers: IPerfObservers = {};
-  private perfResourceTiming: IPerformanceDataConsumption = {
+  private perfResourceSize: IPerformanceDataConsumption = {
     beacon: 0,
     css: 0,
     fetch: 0,
@@ -339,7 +332,7 @@ export default class Nemetric {
       this.initLargestContentfulPaint();
     });
     // Collects KB information related to resources on the page
-    if (this.config.resourceTiming || this.config.dataConsumption) {
+    if (this.config.dataConsumption ) {
       this.observeDataConsumption = new Promise(resolve => {
         this.observers['dataConsumption'] = resolve;
         this.initDataConsumption();
@@ -408,8 +401,8 @@ export default class Nemetric {
         performanceEntry.decodedBodySize &&
         performanceEntry.initiatorType) {
         const bodySize = performanceEntry.decodedBodySize / 1000;
-        this.perfResourceTiming[performanceEntry.initiatorType] += bodySize;
-        this.perfResourceTiming.total += bodySize;
+        this.perfResourceSize[performanceEntry.initiatorType] += bodySize;
+        this.perfResourceSize.total += bodySize;
       }
     });
   }
@@ -506,7 +499,7 @@ export default class Nemetric {
     }
     clearTimeout(this.dataConsumptionTimeout);
     this.dataConsumptionTimeout = undefined;
-    this.logData('dataConsumption', this.perfResourceTiming);
+    this.logData('dataConsumption', this.perfResourceSize);
   }
 
   private logData(metricName: string, data: any): void {
