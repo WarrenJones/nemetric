@@ -7,5 +7,15 @@ new Nemetric({
   dataConsumption:false,
   analyticsTracker: (data) => {
     console.log("report data:", JSON.stringify(data));
+    //Report the data to the server
+    // axios.get('/nemetric-data', {
+    //   params: data
+    // })
+    // .then(function (response) {
+    //   console.log(response);
+    // })
+    // .catch(function (error) {
+    //   console.log(error);
+    // });
   }
 });

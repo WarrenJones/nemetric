@@ -8,7 +8,7 @@ npm i
 
 * compile TS to js
 ```
-npm run webpack
+npm run webpack-dev
 ```
 
 * use chrome open `nemetric_demmo_pc.html` or `nemetric_demmo_mobile.html`
