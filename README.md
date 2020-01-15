@@ -234,38 +234,67 @@ nemetric.log('Custom logging', duration);
 //warren.js: Custom logging 0.14 ms
 ```
 
+
 ### React
 结合React 框架，我们可以开始配置`Nemetric`来收集初始化性能指标（比如 FCP,FID）。
 
 将`nemetric.start()` 和 `nemetric.endPaint()` API用于组件的生命周期，已测量绘制组件所需要的时间。
 
-
 ```javascript
-import React from 'react';
-import Nemetric from 'nemetric';
-
 import request from 'request';
+import Nemetric from 'nemetric';
+/**
+ * 公开nemetric的装饰器接头
+ * 自动绑定nemetric到对象里面,只需要
+ * 1.在被绑定类里面声明静态变量 nemetric
+ * 2.直接类命.nemetric就可以调用
+ * 
+ * @param project 项目名字
+ * @param needReport 是否需要上报
+ */
+export const plugInNemetric = (project: string, needReport = true) => {
+  return (target: Object) => {
+    if (!Reflect.has(target, 'nemetric')) {
+      const nemetric = new Nemetric({
+        firstInputDelay: true,
+        firstContentfulPaint: true,
+        largestContentfulPaint: true,
+        navigationTiming: true,
+        dataConsumption: true,
+        networkInformation: true,
+        analyticsTracker: (data: IAnalyticsTrackerOptions) => {
+          //上报到后台 
+          if (needReport) {
+              request.post('/metric/measure', { ...data, project} }).catch(err => {
+                console.log('nemetric report failed')
+              });
+          }
+        }
+      })
+      Reflect.set(target, 'nemetric', nemetric);
+    }
+  }
+}
 
-const nemetric = new Nemetric({
-  firstContentfulPaint: true,
-  firstInputDelay: true
-});
 
+import React from 'react';
+
+@plugInNemetric('App',true)
 export default class App extends React.Component {
 
   constructor() {
     // 开始测量要绘制的组件时间
-    nemetric.start('AppAfterPaint');
+    App.Nemetric.start('AppAfterPaint');
   }
 
   loadData = async () => {
     await request.get('whatever1');
     await request.get('whatever2');
     if(err){
-       nemetric.clear('AppAfterPaint');
+       App.Nemetric.clear('AppAfterPaint');
     }
     // 结束测量部件绘制时间
-    nemetric.endPaint('AppAfterPaint');
+    App.Nemetric.endPaint('AppAfterPaint');
   }
 
   render() {
@@ -279,6 +308,8 @@ export default class App extends React.Component {
   }
 }
 ```
+
+
 
 
 ## 自定义 & 工具集
