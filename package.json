@@ -1,7 +1,7 @@
 {
   "name": "nemetric",
   "version": "1.2.4",
-  "description": "用于测量第一个dom生成的时间(FP/FCP/LCP)、用户最早可操作时间（fid|tti）和组件的生命周期性能。向监控后台报告实际用户测量值。",
+  "description": "前端性能监控，用于测量第一个dom生成的时间(FP/FCP/LCP)、用户最早可操作时间（fid|tti）和组件的生命周期性能。向监控后台报告实际用户测量值。",
   "main": "dist/nemetric.min.js",
   "iife": "dist/nemetric.iife.min.js",
   "module": "dist/nemetric.esm.min.js",
@@ -11,6 +11,7 @@
     "performance-metrics",
     "metrics",
     "navigation-timing",
+    "navigatorInformation",
     "first-paint",
     "first-contentful-paint",
     "first-input-delay",
