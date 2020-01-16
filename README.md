@@ -1,5 +1,5 @@
 
-<a href="http://www.perfumejs.com/">
+<a href="https://github.com/WarrenJones/nemetric">
   <img src="https://res.unclewarren.cn/nemo.png" align="left" width="200" />
 </a>
 
@@ -284,17 +284,17 @@ export default class App extends React.Component {
 
   constructor() {
     // 开始测量要绘制的组件时间
-    App.Nemetric.start('AppAfterPaint');
+    App.nemetric.start('AppAfterPaint');
   }
 
   loadData = async () => {
     await request.get('whatever1');
     await request.get('whatever2');
     if(err){
-       App.Nemetric.clear('AppAfterPaint');
+       App.nemetric.clear('AppAfterPaint');
     }
     // 结束测量部件绘制时间
-    App.Nemetric.endPaint('AppAfterPaint');
+    App.nemetric.endPaint('AppAfterPaint');
   }
 
   render() {
@@ -364,8 +364,6 @@ nemetric.sendTiming(metricName, durationFCP);
 
 
 ## 文章
-
-
 * [Nemetric 实现原理](https://unclewarren.cn/2019/11/05/%20Nemetric%20%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/)
 * [如何采集和分析网页用户的性能指标](https://unclewarren.cn/2019/08/19/如何采集和分析网页用户的性能指标/)
 * [Assessing Loading Performance in Real Life with Navigation and Resource Timing](https://developers.google.com/web/fundamentals/performance/user-centric-performance-metrics)
