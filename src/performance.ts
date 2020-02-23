@@ -67,6 +67,8 @@ export interface INemetricNetworkInformation {
   //https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/rtt
   rtt?: number;
   saveData?: boolean;
+  //https://developer.mozilla.org/en-US/docs/Web/API/NavigatorConcurrentHardware/hardwareConcurrency
+  hardwareConcurrency?:number;
 }
 
 export interface IPerformanceObserver {
@@ -185,6 +187,7 @@ export default class Performance {
         effectiveType: dataConnection.effectiveType,
         rtt: dataConnection.rtt,
         saveData: !!dataConnection.saveData,
+        hardwareConcurrency:(window.navigator as any).hardwareConcurrency
       };
     }
     return {};

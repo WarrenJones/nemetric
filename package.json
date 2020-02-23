@@ -1,6 +1,6 @@
 {
   "name": "nemetric",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "前端性能监控,采集以及上报。用于测量第一个dom生成的时间(FP/FCP/LCP)、用户最早可操作时间（fid|tti）和组件的生命周期性能,，网络状况以及资源大小等等。向监控后台报告实际用户测量值。",
   "main": "dist/nemetric.min.js",
   "iife": "dist/nemetric.iife.min.js",
@@ -20,6 +20,11 @@
     "user-timing",
     "web-performance",
     "webperf",
+    "hardwareConcurrency",
+    "downlink",
+    "downlinkMax",
+    "effectiveType",
+    "rtt",
     "react",
     "性能",
     "采集",
@@ -35,8 +40,9 @@
     "test": "jest",
     "prebuild": "rimraf dist",
     "build": "tsc && tsc --module commonjs --outDir dist/lib && rollup -c rollup.config.ts",
-    "start": "tsc -w & rollup -c rollup.config.ts -w",
-    "webpack-dev": "webpack  --watch --mode development"
+    "major": "npm version major -m \"Upgrade to %s\"",
+    "minor": "npm version minor -m \"Upgrade to %s\"",
+    "patch": "npm version patch -m \"Upgrade to %s\""
   },
   "repository": {
     "type": "git",
@@ -89,15 +95,16 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
+    "@types/node": "^13.7.4",
     "jest": "^24.9.0",
-    "rollup": "^1.27.8",
+    "rollup": "^1.31.1",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-terser": "^5.1.2",
     "ts-jest": "^24.2.0",
     "ts-node": "^8.5.4",
-    "typescript": "^3.7.3",
+    "typescript": "^3.8.2",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.3.10"
   }
